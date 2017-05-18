@@ -41,6 +41,8 @@ public class WordSegmenter {
         Collections.reverse(result);
         return result;
     }
+
+    // TODO: 2017/5/18 it may not right to use re to match all English word firstly, because some words may contain both Chinese and English
     public List<String> bmmProcessEnglish(String sentence) {
         LinkedList<String> result = new LinkedList<>();
         Matcher mat = reSkip.matcher(sentence);

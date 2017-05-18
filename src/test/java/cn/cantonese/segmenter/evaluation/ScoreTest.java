@@ -25,9 +25,9 @@ public class ScoreTest {
         files.add("data/chat/chat.txt");
         Data<String> data = new FileData(files);
         System.out.println(
-                score.calStatistics(Arrays.asList(new HMMSeg(), new WordSeg(), new JiebaSeg()),
+                score.calStatistics(Arrays.asList( new WordSeg()),
                 data,
-                Arrays.asList(new DefaultEvaluation(), new BMES()))
+                Arrays.asList(new DefaultEvaluation(), new BMES(), new SentencePerfect()))
         );
     }
 
@@ -51,7 +51,7 @@ class HMMSeg implements Segmenter {
     private HMMSegmenter hmmSegmenter = new HMMSegmenter();
     @Override
     public List<String> processSentence(String sentence) {
-        return hmmSegmenter.processSentence(sentence);
+        return hmmSegmenter.processEnglish(sentence);
     }
 
     @Override

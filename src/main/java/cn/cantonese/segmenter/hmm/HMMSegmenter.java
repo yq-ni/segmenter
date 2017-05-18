@@ -5,6 +5,8 @@ import cn.cantonese.segmenter.data.DataIterator;
 import cn.cantonese.segmenter.data.FileData;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class HMMSegmenter {
 
@@ -17,6 +19,8 @@ public class HMMSegmenter {
     private double[] start = new double[STATE_NUM];
     private double[][] trans =new double[STATE_NUM][STATE_NUM];
     private static final int[][] PREV_STATUS = { {2, 3}, {0, 1}, {0, 1}, {2, 3}};
+    private Pattern reSkip = Pattern.compile("(\\d+\\.\\d+|[a-zA-Z0-9]+)");
+
     public HMMSegmenter() {
         load();
     }
@@ -132,6 +136,20 @@ public class HMMSegmenter {
         return tokens;
     }
 
-
+    public List<String> processEnglish(String sentence) {
+        LinkedList<String> result = new LinkedList<>();
+        Matcher mat = reSkip.matcher(sentence);
+        int offset = 0;
+        while (mat.find()) {
+            if (mat.start() > offset) {
+                result.addAll(processSentence(sentence.substring(offset, mat.start())));
+            }
+            result.add(mat.group());
+            offset = mat.end();
+        }
+        if (offset < sentence.length())
+            result.addAll(processSentence(sentence.substring(offset)));
+        return result;
+    }
 
 }

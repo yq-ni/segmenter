@@ -69,4 +69,6 @@ public class Generate {
             e.printStackTrace();
         }
     }
+
+    // TODO: 2017/5/18 how to generate a nice emit matrix
 }

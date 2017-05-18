@@ -37,7 +37,7 @@ public class Score {
     }
 
     public List<Statistics> calStatistics(Segmenter segmenter, Data<String> data) {
-        return calStatistics(segmenter, data, Arrays.asList(new DefaultEvaluation(), new BMES()));
+        return calStatistics(segmenter, data, Arrays.asList(new DefaultEvaluation(), new BMES(), new SentencePerfect()));
     }
 
     public List<Statistics> calStatistics(Segmenter segmenter, Data<String> data, List<Evaluation> evaluations) {

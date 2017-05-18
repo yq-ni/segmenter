@@ -33,6 +33,9 @@ public class Utils {
     }
 
     public static String tokensToGold(List<String> tokens) {
+        // TODO: 2017/5/18 pay attention to whitespace
+        tokens.removeIf((token)->Pattern.matches("\\s+", token));
+
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < tokens.size(); i++) {
             sb.append(tokens.get(i));
