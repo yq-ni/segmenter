@@ -1,6 +1,7 @@
 package cn.cantonese.segmenter.evaluation;
 
 
+import cn.cantonese.segmenter.Utils;
 import cn.cantonese.segmenter.data.Data;
 import cn.cantonese.segmenter.data.FileData;
 import cn.cantonese.segmenter.hmm.HMMSegmenter;
@@ -25,7 +26,7 @@ public class ScoreTest {
         files.add("data/chat/chat.txt");
         Data<String> data = new FileData(files);
         System.out.println(
-                score.calStatistics(Arrays.asList( new WordSeg()),
+                score.calStatistics(Arrays.asList( new HMMSeg(), new WordSeg()),
                 data,
                 Arrays.asList(new DefaultEvaluation(), new BMES(), new SentencePerfect()))
         );

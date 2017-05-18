@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 public class WordSegmenter {
     private WordDictionary wordDictionary;
-    private Pattern reSkip = Pattern.compile("(\\d+\\.\\d+|[a-zA-Z0-9]+)");
+    private Pattern reSkip = Pattern.compile("((\\w)+(\\.\\w+)*@(\\w)+((\\.\\w+)*)|\\d+\\.\\d+|[a-zA-Z0-9]+)");
 
     public WordSegmenter() {
         wordDictionary = new WordDictionary();

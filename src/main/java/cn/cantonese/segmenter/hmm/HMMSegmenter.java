@@ -19,7 +19,7 @@ public class HMMSegmenter {
     private double[] start = new double[STATE_NUM];
     private double[][] trans =new double[STATE_NUM][STATE_NUM];
     private static final int[][] PREV_STATUS = { {2, 3}, {0, 1}, {0, 1}, {2, 3}};
-    private Pattern reSkip = Pattern.compile("(\\d+\\.\\d+|[a-zA-Z0-9]+)");
+    private Pattern reSkip = Pattern.compile("((\\w)+(\\.\\w+)*@(\\w)+((\\.\\w+)*)|\\d+\\.\\d+|[a-zA-Z0-9]+)");
 
     public HMMSegmenter() {
         load();
@@ -136,6 +136,7 @@ public class HMMSegmenter {
         return tokens;
     }
 
+    // TODO: 2017/5/18 same problem that process english word firstly
     public List<String> processEnglish(String sentence) {
         LinkedList<String> result = new LinkedList<>();
         Matcher mat = reSkip.matcher(sentence);
