@@ -9,16 +9,24 @@ public class FileData implements Data<String> {
     private List<String> filePaths;
 
     public FileData(String filePath) {
-        this(new String[]{filePath});
+        this(Arrays.asList(filePath));
     }
 
     public FileData(String[] filePaths) {
-        this.filePaths = new ArrayList<>();
-        Collections.addAll(this.filePaths, filePaths);
+        this(Arrays.asList(filePaths));
     }
 
     public FileData(List<String> filePaths) {
         this.filePaths = new ArrayList<>(filePaths);
+        validate();
+    }
+
+    // could do more, check whether file exists and so on...
+    private void validate() {
+        filePaths.removeIf((filePath)->filePath.trim().length()==0);
+        if (filePaths.size() == 0) {
+            throw new RuntimeException("invalid filePaths");
+        }
     }
 
     @Override
@@ -36,31 +44,26 @@ public class FileData implements Data<String> {
         int index = 0;
         FileDataIterator(){}
 
-        public boolean hasNext() throws IOException {
+        private void turnToNextFileIfNeed() throws IOException {
+            if (index >= filePaths.size()) {
+                return;
+            }
             if (bufferedReader == null) {
-                if (index >= filePaths.size()) {
-                    return false;
-                }
-            }
-            else {
-                if (bufferedReader.ready()) {
-                    return true;
-                }
-                else {
-                    bufferedReader.close();
-                    bufferedReader = null;
-                }
-            }
-            if (index < filePaths.size()) {
                 bufferedReader = new BufferedReader(new FileReader(filePaths.get(index++)));
-                return bufferedReader.ready();
             }
-            return false;
+            else if (!bufferedReader.ready()) {
+                bufferedReader.close();
+                bufferedReader = new BufferedReader(new FileReader(filePaths.get(index++)));
+            }
+        }
+
+        public boolean hasNext() throws IOException {
+            turnToNextFileIfNeed();
+            return bufferedReader != null && bufferedReader.ready();
         }
 
         public String next() throws IOException{
-            hasNext();
-            // TODO: 2017/5/17 terrible
+            turnToNextFileIfNeed();
             return bufferedReader.readLine();
         }
 

@@ -22,11 +22,20 @@ public class Score {
         return new ScoreBuilder();
     }
 
-    // TODO: 2017/5/19 calculate data size?
-    public Map<String, Double> performanceRun(int time) {
-        Map<String, Double> timeMap = new HashMap<>();
+    public Map<String, Performance> performanceRun(int time) {
+        Map<String, Performance> timeMap = new HashMap<>();
+
+        // may calculate while segmenter are running to save time? may affect segmenter's speed?
+        long totalChar = 0;
+        for (Data<String> data : dataList) {
+            SafeDataIterator<String> iterator = data.safeDataIterator();
+            while (iterator.hasNext()) {
+                totalChar += iterator.next().length();
+            }
+        }
+
         for (Segmenter segmenter : segmenters) {
-            double total = 0;
+            long total = 0;
             for (int i = 0; i < time; i++) {
                 for (Data<String> data : dataList) {
                     SafeDataIterator<String> iterator = data.safeDataIterator();
@@ -39,7 +48,7 @@ public class Score {
                     total += System.currentTimeMillis() - start;
                 }
             }
-            timeMap.put(segmenter.getId(), total / time);
+            timeMap.put(segmenter.getId(), new Performance(time, total, totalChar*time));
         }
         return timeMap;
     }
