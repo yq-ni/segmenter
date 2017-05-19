@@ -18,18 +18,22 @@ public class ScoreTest {
     }
 
     public static void score() {
-        Score score = new Score();
         List<String> files = new ArrayList<>();
         for (int i = 1; i <= 14; i++) {
             files.add("data/movies/movie_"+i+".txt");
         }
         files.add("data/chat/chat.txt");
         Data<String> data = new FileData(files);
-        System.out.println(
-                score.calStatistics(Arrays.asList( new HMMSeg(), new WordSeg()),
-                data,
-                Arrays.asList(new DefaultEvaluation(), new BMES(), new SentencePerfect()))
-        );
+        Score score = Score.builder()
+                .withSegmenter(new HMMSeg())
+                .withSegmenter(new WordSeg())
+                .withData(data)
+                .withEvaluation(new DefaultEvaluation())
+                .withEvaluation(new BMES())
+                .withEvaluation(new SentencePerfect())
+                .build();
+        System.out.println(score.calStatistics());
+//        System.out.println(score.performanceRun(5));
     }
 
 }
