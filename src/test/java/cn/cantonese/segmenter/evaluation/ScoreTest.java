@@ -5,6 +5,7 @@ import cn.cantonese.segmenter.Utils;
 import cn.cantonese.segmenter.data.Data;
 import cn.cantonese.segmenter.data.FileData;
 import cn.cantonese.segmenter.hmm.HMMSegmenter;
+import cn.cantonese.segmenter.hmm.HMMTnT;
 import cn.cantonese.segmenter.word.WordSegmenter;
 import com.huaban.analysis.jieba.JiebaSegmenter;
 
@@ -22,9 +23,12 @@ public class ScoreTest {
         for (int i = 1; i <= 14; i++) {
             files.add("data/movies/movie_"+i+".txt");
         }
+        HMMTnT hmmTnT = new HMMTnT();
+        hmmTnT.train(new FileData(files));
         files.add("data/chat/chat.txt");
         Data<String> data = new FileData(files);
         Score score = Score.builder()
+                .withSegmenter(hmmTnT)
                 .withSegmenter(new HMMSeg())
                 .withSegmenter(new WordSeg())
                 .withData(data)

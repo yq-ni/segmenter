@@ -12,7 +12,7 @@ public class Performance {
     }
 
     public double speed() {
-        return 1. * totalChar / totalCostMs / runTimes;
+        return 1. * totalChar / totalCostMs;
     }
 
     public int getRunTimes() {
