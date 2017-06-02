@@ -5,7 +5,10 @@ import cn.cantonese.segmenter.data.Data;
 import cn.cantonese.segmenter.data.DataIterator;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Generate {
     public Generate() {}
@@ -71,4 +74,63 @@ public class Generate {
     }
 
     // TODO: 2017/5/18 how to generate a nice emit matrix
+    public void emit(Data<String> data) {
+        int[] count = new int[4];
+        List<Map<Character, Double>> maps = new ArrayList<>(4);
+        for (int i = 0; i < 4; i++) {
+            maps.add(new HashMap<>());
+        }
+        try (DataIterator<String> iterator = data.dataIterator()) {
+            while (iterator.hasNext()) {
+                String sentence = iterator.next();
+                String[] words = sentence.split(Utils.SEG_DELIMITER);
+                for (String word : words) {
+                    if (word.length() == 1) {
+                        put(word.charAt(0), 3, maps, count);
+                    }
+                    else {
+                        put(word.charAt(0), 0, maps, count);
+                        for (int i = 1; i < word.length()-1; i++) {
+                            put(word.charAt(i), 1, maps, count);
+                        }
+                        put(word.charAt(word.length()-1), 2, maps, count);
+                    }
+                }
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        for (int i = 0; i < maps.size(); i++) {
+            Map<Character, Double> map = maps.get(i);
+            for (Map.Entry<Character, Double> entry : map.entrySet()) {
+                map.put(entry.getKey(), entry.getValue() / count[i]);
+            }
+        }
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("emit.txt"))) {
+            int i = 0;
+            for (String state : new String[] {"B\n", "M\n", "E\n", "S\n"}) {
+                writer.write(state);
+                for (Map.Entry<Character, Double> entry : maps.get(i).entrySet()) {
+                    writer.write(entry.getKey());;
+                    writer.write(Utils.PART_DELIMITER);
+                    writer.write(""+entry.getValue());
+                    writer.write("\n");
+                }
+                i++;
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void put(char c, int state, List<Map<Character, Double>> maps, int[] count) {
+        count[state] += 1;
+        Double i = maps.get(state).get(c);
+        if (i == null) i = 0.;
+        i += 1;
+        maps.get(state).put(c, i);
+    }
 }
