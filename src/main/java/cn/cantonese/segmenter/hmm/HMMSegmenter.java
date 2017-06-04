@@ -22,14 +22,18 @@ public class HMMSegmenter {
     private Pattern reSkip = Pattern.compile("((\\w)+(\\.\\w+)*@(\\w)+((\\.\\w+)*)|\\d+\\.\\d+|[a-zA-Z0-9]+)");
 
     public HMMSegmenter() {
-        load();
+        load(EMIT, TRANS, START);
     }
 
-    private void load() {
+    public HMMSegmenter(String trans, String start, String emit) {
+        load(trans, start, emit);
+    }
+
+    private void load(String trans, String start, String emit) {
         try {
-            loadSTART(START);
-            loadTRANS(TRANS);
-            loadEMIT(EMIT);
+            loadSTART(start);
+            loadTRANS(trans);
+            loadEMIT(emit);
         }
         catch (Exception e) {
             e.printStackTrace();

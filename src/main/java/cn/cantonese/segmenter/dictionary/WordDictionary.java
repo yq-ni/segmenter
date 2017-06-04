@@ -34,7 +34,7 @@ public class WordDictionary {
                 String[] word_freq = line.split(Utils.PART_DELIMITER_REGEX);
                 if (word_freq.length > 0) {
                     word = word_freq[0];
-//                    if (word.length() == 1) continue;
+                    if (word.length() <= 1) continue;
                     freq = word_freq.length == 1 ? 1 : Integer.valueOf(word_freq[1]);
                     wordFreqMap.put(word, freq);
                     if (word_freq[0].length() > maxWordLength) {

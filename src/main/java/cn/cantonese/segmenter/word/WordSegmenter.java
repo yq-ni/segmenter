@@ -15,6 +15,15 @@ public class WordSegmenter {
     public WordSegmenter() {
         wordDictionary = new WordDictionary();
     }
+
+    public WordSegmenter(WordDictionary wordDictionary) {
+        this.wordDictionary = wordDictionary;
+    }
+
+    public WordSegmenter(String wordDictionaryPath) {
+        this.wordDictionary = new WordDictionary(wordDictionaryPath);
+    }
+
     public List<String> bmm(String sentence) {
         LinkedList<String> result = new LinkedList<>();
         int maxWordLength = wordDictionary.getMaxWordLength();

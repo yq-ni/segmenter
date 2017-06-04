@@ -13,13 +13,36 @@ import java.util.Map;
 public class Generate {
     public Generate() {}
 
-    public void trans(Data<String> data) {
-        int[][] count = new int[4][4];
-        double[][] trans = new double[4][4];
+    public static void train(Data<String> data, String trans, String start, String emit) {
+        int[][] transCount = new int[4][4];
         int BCount = 0, SCount = 0;
+        int[] count = new int[4];
+        List<Map<Character, Double>> maps = new ArrayList<>(4);
+        for (int i = 0; i < 4; i++) {
+            maps.add(new HashMap<>());
+        }
         try (DataIterator<String> iterator = data.dataIterator()) {
             while (iterator.hasNext()) {
-                List<Integer> states = Utils.toStates(iterator.next());
+                String sentence = iterator.next();
+                List<Integer> states = new ArrayList<>(sentence.length());
+                String[] words = sentence.split(Utils.SEG_DELIMITER);
+                for (String word : words) {
+                    if (word.length() == 1) {
+                        put(word.charAt(0), 3, maps, count);
+                        states.add(3);
+                    }
+                    else {
+                        put(word.charAt(0), 0, maps, count);
+                        states.add(0);
+                        for (int i = 1; i < word.length()-1; i++) {
+                            put(word.charAt(i), 1, maps, count);
+                            states.add(1);
+                        }
+                        put(word.charAt(word.length()-1), 2, maps, count);
+                        states.add(2);
+                    }
+                }
+
                 if (states.get(0) == 0) {
                     BCount++;
                 }
@@ -27,8 +50,9 @@ public class Generate {
                     assert states.get(0) == 3;
                     SCount++;
                 }
+
                 for (int i = 1; i < states.size(); i++) {
-                    count[states.get(i-1)][states.get(i)]++;
+                    transCount[states.get(i-1)][states.get(i)]++;
                 }
             }
         }
@@ -36,6 +60,13 @@ public class Generate {
             e.printStackTrace();
             return;
         }
+        transMatrix(transCount, trans);
+        startMatrix(BCount, SCount, start);
+        emitMatrix(maps, count, emit);
+    }
+
+    public static void transMatrix(int[][] count, String path) {
+        double[][] trans = new double[4][4];
         for (int i = 0; i < trans.length; i++) {
             int sum = 0;
             for (int j = 0; j < trans[i].length; j++) sum += count[i][j];
@@ -43,7 +74,7 @@ public class Generate {
                 trans[i][j] = count[i][j] * 1. / sum;
             }
         }
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("trans.txt"))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(path))) {
             for (int i = 0; i < trans.length; i++) {
                 for (int j = 0; j < trans[i].length; j++) {
                     writer.write(trans[i][j] + "");
@@ -57,8 +88,10 @@ public class Generate {
         catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("start.txt"))) {
+    public static void startMatrix(int BCount, int SCount, String path) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(path))) {
             int sum = BCount + SCount;
             double b = BCount * 1. / sum;
             double m = 0., e = m;
@@ -74,41 +107,14 @@ public class Generate {
     }
 
     // TODO: 2017/5/18 how to generate a nice emit matrix
-    public void emit(Data<String> data) {
-        int[] count = new int[4];
-        List<Map<Character, Double>> maps = new ArrayList<>(4);
-        for (int i = 0; i < 4; i++) {
-            maps.add(new HashMap<>());
-        }
-        try (DataIterator<String> iterator = data.dataIterator()) {
-            while (iterator.hasNext()) {
-                String sentence = iterator.next();
-                String[] words = sentence.split(Utils.SEG_DELIMITER);
-                for (String word : words) {
-                    if (word.length() == 1) {
-                        put(word.charAt(0), 3, maps, count);
-                    }
-                    else {
-                        put(word.charAt(0), 0, maps, count);
-                        for (int i = 1; i < word.length()-1; i++) {
-                            put(word.charAt(i), 1, maps, count);
-                        }
-                        put(word.charAt(word.length()-1), 2, maps, count);
-                    }
-                }
-            }
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-
+    public static void emitMatrix(List<Map<Character, Double>> maps, int[] count, String path) {
         for (int i = 0; i < maps.size(); i++) {
             Map<Character, Double> map = maps.get(i);
             for (Map.Entry<Character, Double> entry : map.entrySet()) {
                 map.put(entry.getKey(), entry.getValue() / count[i]);
             }
         }
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("emit.txt"))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(path))) {
             int i = 0;
             for (String state : new String[] {"B\n", "M\n", "E\n", "S\n"}) {
                 writer.write(state);
@@ -126,7 +132,7 @@ public class Generate {
         }
     }
 
-    private void put(char c, int state, List<Map<Character, Double>> maps, int[] count) {
+    private static void put(char c, int state, List<Map<Character, Double>> maps, int[] count) {
         count[state] += 1;
         Double i = maps.get(state).get(c);
         if (i == null) i = 0.;
