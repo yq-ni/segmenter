@@ -36,7 +36,7 @@ public class DefaultEvaluation implements Evaluation{
         return tupleA;
     }
 
-    class DefaultStatistics implements Statistics {
+    public static class DefaultStatistics implements Statistics {
         private int segCorrect = 0;
         private int segWrong = 0;
         private int goldTotal = 0;
@@ -49,7 +49,7 @@ public class DefaultEvaluation implements Evaluation{
 
         @Override
         public void merge(Statistics statistics) {
-            if (!(statistics instanceof DefaultStatistics)) return;
+            if (!(statistics instanceof DefaultStatistics)) throw new RuntimeException("not support");;
             segCorrect += ((DefaultStatistics) statistics).segCorrect;
             segWrong += ((DefaultStatistics) statistics).segWrong;
             goldTotal += ((DefaultStatistics) statistics).goldTotal;
@@ -61,6 +61,19 @@ public class DefaultEvaluation implements Evaluation{
             double P = segCorrect * 1. / (segCorrect + segWrong);
             double F = 2 * P * R / (P + R);
             return String.format("\nDefaultEvaluation:\n {P: %f, R: %f, F: %f}\n", P, R, F);
+        }
+
+        public double calR() {
+            return segCorrect * 1. / goldTotal;
+        }
+
+        public double calP() {
+            return segCorrect * 1. / (segCorrect + segWrong);
+        }
+
+        public double calF() {
+            double R = calR(), P = calP();
+            return 2 * P * R / (P + R);
         }
     }
 }

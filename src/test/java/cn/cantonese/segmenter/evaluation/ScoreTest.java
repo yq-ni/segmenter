@@ -26,7 +26,7 @@ public class ScoreTest {
         String words = "temp/words.txt";
         Data<String> trainData = getTrainData();
         Data<String> testData = getTestData();
-        GenerateWord.generateWords(trainData, words);
+//        GenerateWord.generateWords(trainData, words);
         Generate.train(trainData, trans, start, emit);
         System.out.printf("trainData size: %d\n", size(trainData));
         System.out.printf("testData size: %d\n", size(testData));

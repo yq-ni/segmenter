@@ -32,11 +32,11 @@ public class BMES implements Evaluation {
         return new BMESStatistics(segCorrect, segWrong, goldTotal);
     }
 
-    class BMESStatistics implements Statistics {
-        static final int STATE_NUM = 4;
-        int[] segCorrect = new int[STATE_NUM];
-        int[] segWrong = new int[STATE_NUM];
-        int[] goldTotal = new int[STATE_NUM];
+    public static class BMESStatistics implements Statistics {
+        public static final int STATE_NUM = 4;
+        private int[] segCorrect = new int[STATE_NUM];
+        private int[] segWrong = new int[STATE_NUM];
+        private int[] goldTotal = new int[STATE_NUM];
         BMESStatistics() {}
 
         BMESStatistics(int[] segCorrect, int[] segWrong, int[] goldTotal) {
@@ -50,7 +50,7 @@ public class BMES implements Evaluation {
 
         @Override
         public void merge(Statistics statistics) {
-            if (!(statistics instanceof BMESStatistics)) return;
+            if (!(statistics instanceof BMESStatistics)) throw new RuntimeException("not support");
             for (int i = 0; i < STATE_NUM; i++) {
                 this.segCorrect[i] += ((BMESStatistics) statistics).segCorrect[i];
                 this.segWrong[i] += ((BMESStatistics) statistics).segWrong[i];
@@ -81,6 +81,18 @@ public class BMES implements Evaluation {
                 sb.append(String.format("P=%f, R=%f, F=%f\n", P, R, F));
             }
             return sb.toString();
+        }
+
+        public int[] getSegCorrect() {
+            return segCorrect;
+        }
+
+        public int[] getSegWrong() {
+            return segWrong;
+        }
+
+        public int[] getGoldTotal() {
+            return goldTotal;
         }
     }
 }

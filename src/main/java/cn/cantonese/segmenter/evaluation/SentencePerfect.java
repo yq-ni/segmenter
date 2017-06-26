@@ -12,7 +12,7 @@ public class SentencePerfect implements Evaluation, Statistics{
 
     @Override
     public void merge(Statistics statistics) {
-        if (!(statistics instanceof SentencePerfect)) return;
+        if (!(statistics instanceof SentencePerfect)) throw new RuntimeException("not support");;
         this.perfect += ((SentencePerfect) statistics).perfect;
         this.total += ((SentencePerfect) statistics).total;
     }
@@ -20,5 +20,13 @@ public class SentencePerfect implements Evaluation, Statistics{
     @Override
     public String toString() {
         return "\nSentencePerfect:\n{perfect sentence: "+perfect*1./total+"}\n";
+    }
+
+    public int getPerfect() {
+        return perfect;
+    }
+
+    public int getTotal() {
+        return total;
     }
 }
